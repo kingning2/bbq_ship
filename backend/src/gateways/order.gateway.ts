@@ -10,9 +10,6 @@ import { Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
 @WebSocketGateway({
-  cors: {
-    origin: '*',
-  },
   namespace: 'orders',
 })
 export class OrderGateway

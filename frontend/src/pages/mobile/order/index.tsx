@@ -194,7 +194,7 @@ const OrderPage: React.FC = () => {
                   {cart.find((item) => item.id === product.id)?.quantity > 0 ? (
                     <Stepper
                       min={0}
-                      max={product.stock}
+                      max={product.stock - product.soldQuantity}
                       value={cart.find((item) => item.id === product.id)?.quantity || 0}
                       onChange={(value) => updateQuantity(product.id, value)}
                     />

@@ -37,10 +37,31 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'antd'],
-          utils: ['dayjs', 'socket.io-client'],
+        entryFileNames: "js/[name]-[hash].js",
+        chunkFileNames: "js/[name]-[hash].js",
+        assetFileNames(assets) {
+          if (assets.name.endsWith(".css")) {
+            return "css/[name]-[hash].css";
+          }
+          const imgExts = [".png", ".jpg", ".jpeg", ".webp", ".svg"];
+          if (imgExts.some((ext) => assets.name.endsWith(ext))) {
+            return "image/[name]-[hash].[ext]";
+          }
+          return "assets/[name]-[hash].[ext]";
         },
+        manualChunks(id) {
+          if (id.includes("node_modules/.pnpm")) {
+            const name = id.split('/')[6][0];
+            return name;
+          }
+        },
+      },
+    },
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true, // 生产环境移除console
+        drop_debugger: true, // 生产环境移除debugger
       },
     },
   },

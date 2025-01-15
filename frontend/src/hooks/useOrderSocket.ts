@@ -4,7 +4,7 @@ import { io } from 'socket.io-client';
 export const useOrderSocket = (onOrderUpdate?: (order: any) => void) => {
   useEffect(() => {
     // 直接连接到后端 WebSocket 服务器
-    const socket = io('ws://localhost:8080/orders', {
+    const socket = io(import.meta.env.VITE_API_URL + '/orders', {
       transports: ['websocket'],
     });
 
