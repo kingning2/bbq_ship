@@ -1,0 +1,337 @@
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  :global {
+    // Card组件样式
+    .ant-card {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+
+      .ant-card-body {
+        flex: 1;
+        padding: 24px;
+        height: calc(100% - 57px);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+
+        @media (max-width: 768px) {
+          padding: 12px;
+        }
+      }
+    }
+
+    // 表格样式优化
+    .ant-table-wrapper {
+      flex: 1;
+      overflow: hidden;
+
+      .ant-spin-nested-loading {
+        height: 100%;
+
+        .ant-spin-container {
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+
+          .ant-table {
+            flex: 1;
+            overflow: hidden;
+
+            .ant-table-container {
+              height: 100%;
+
+              .ant-table-header {
+                position: sticky;
+                top: 0;
+                z-index: 2;
+                background: #fff;
+              }
+
+              .ant-table-body {
+                height: calc(100% - 55px);
+                overflow-y: auto !important;
+              }
+            }
+          }
+
+          .ant-table-pagination {
+            margin: 16px 0;
+          }
+        }
+      }
+    }
+
+    .ant-card-head {
+      @media (max-width: 768px) {
+        padding: 0 12px;
+        min-height: auto;
+      }
+
+      .ant-card-head-wrapper {
+        @media (max-width: 1200px) {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+
+      .ant-card-head-title {
+        font-size: 18px;
+        font-weight: bold;
+        padding: 16px 0;
+
+        @media (max-width: 768px) {
+          padding: 12px 0;
+          font-size: 16px;
+        }
+      }
+
+      .ant-card-extra {
+        padding: 16px 0;
+        margin-left: 0;
+        width: 100%;
+
+        @media (max-width: 1200px) {
+          padding: 0 0 16px 0;
+        }
+      }
+    }
+
+    .ant-card-body {
+      padding: 24px;
+
+      @media (max-width: 768px) {
+        padding: 12px;
+      }
+    }
+
+    // 表格样式优化
+    .ant-table {
+      .ant-table-thead > tr > th {
+        font-weight: bold;
+        background: #fafafa;
+        white-space: nowrap;
+        padding: 16px 8px;
+        text-align: center;
+
+        &:first-child {
+          padding-left: 24px;
+        }
+
+        &:last-child {
+          padding-right: 24px;
+        }
+
+        @media (max-width: 768px) {
+          padding: 12px 8px;
+        }
+      }
+
+      .ant-table-tbody > tr > td {
+        padding: 16px 8px;
+        text-align: center;
+
+        &:first-child {
+          padding-left: 24px;
+        }
+
+        &:last-child {
+          padding-right: 24px;
+        }
+
+        @media (max-width: 768px) {
+          padding: 12px 8px;
+        }
+
+        .ant-space-vertical {
+          text-align: center;
+          
+          > div {
+            line-height: 1.5;
+            
+            &:nth-child(1) {
+              color: #666;
+            }
+            
+            &:nth-child(2) {
+              color: #ff4d4f;
+            }
+            
+            &:nth-child(3) {
+              color: #52c41a;
+              font-weight: 500;
+            }
+          }
+        }
+      }
+
+      // 图片单元格样式
+      .ant-image {
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      // 操作列样式
+      .ant-space {
+        justify-content: center;
+
+        .ant-btn-link {
+          padding: 4px 8px;
+          height: auto;
+          line-height: 1;
+
+          &:hover {
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 4px;
+          }
+        }
+      }
+
+      // 开关样式
+      .ant-switch {
+        min-width: 60px;
+      }
+    }
+
+    // 搜索表单样式
+    .ant-form-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 16px;
+
+      .ant-form-item {
+        margin: 0;
+        flex: 0 0 auto;
+
+        @media (max-width: 1200px) {
+          flex: 1 1 calc(50% - 8px);
+          min-width: 200px;
+        }
+
+        @media (max-width: 576px) {
+          flex: 1 1 100%;
+        }
+      }
+
+      .ant-space {
+        flex-wrap: nowrap;
+        gap: 8px;
+
+        @media (max-width: 576px) {
+          width: 100%;
+          
+          .ant-btn {
+            flex: 1;
+          }
+        }
+      }
+    }
+
+    // 分页样式
+    .ant-pagination {
+      margin-top: 16px;
+      padding: 0 24px;
+      
+      @media (max-width: 768px) {
+        padding: 0 12px;
+      }
+    }
+  }
+
+
+
+  // 弹窗样式
+  :global {
+    .ant-modal {
+      width: 1000px !important;
+      
+      .ant-modal-content {
+        padding: 0;
+      }
+
+      .ant-modal-header {
+        margin: 0;
+        padding: 16px 24px;
+        border-bottom: 1px solid #f0f0f0;
+
+        .ant-modal-title {
+          font-size: 16px;
+          font-weight: 500;
+        }
+      }
+
+      .ant-modal-body {
+        padding: 24px;
+      }
+
+      .ant-modal-footer {
+        margin: 0;
+        padding: 16px 24px;
+        border-top: 1px solid #f0f0f0;
+      }
+    }
+  }
+} 
+
+  // 编辑表单样式
+  .editForm {
+    display: flex;
+    gap: 32px;
+
+    .imageSection {
+      width: 400px;
+      padding-right: 32px;
+      border-right: 1px solid #f0f0f0;
+
+      .imageUrl {
+        margin-bottom: 16px;
+      }
+
+      .imagePreview {
+        height: 300px;
+        background: #fafafa;
+        border: 1px dashed #d9d9d9;
+        border-radius: 4px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+
+        .previewImage {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+      }
+    }
+
+    .formSection {
+      flex: 1;
+      min-width: 0;
+
+      :global {
+        .ant-form {
+          .ant-form-item {
+            margin-bottom: 24px;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            .ant-form-item-label {
+              padding-bottom: 8px;
+            }
+
+            .ant-input-textarea {
+              resize: none;
+            }
+          }
+        }
+      }
+    }
+  }

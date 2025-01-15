@@ -1,0 +1,205 @@
+# admins 表 (后台管理员)
+# ----------------------------------------------------------------------------------
+# id            INT             AUTO_INCREMENT     PRIMARY KEY   # 管理员ID，自增长主键
+# username      VARCHAR(255)    NOT NULL           UNIQUE        # 管理员用户名，唯一
+# password      VARCHAR(255)    NOT NULL                         # 管理员密码，需要加密存储
+# created_at    TIMESTAMP       DEFAULT CURRENT_TIMESTAMP        # 创建时间，默认为当前时间
+# updated_at    TIMESTAMP       DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP # 更新时间，默认为当前时间，每次更新自动更新
+
+CREATE TABLE admins (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+# categories 表 (商品分类)
+# ----------------------------------------------------------------------------------
+# id            INT             AUTO_INCREMENT     PRIMARY KEY   # 分类ID，自增长主键
+# name          VARCHAR(255)    NOT NULL           UNIQUE        # 分类名称，唯一
+# created_at    TIMESTAMP       DEFAULT CURRENT_TIMESTAMP        # 创建时间
+# updated_at    TIMESTAMP       DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP # 更新时间
+
+CREATE TABLE categories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+# products 表 (商品列表)
+# ----------------------------------------------------------------------------------
+# id            INT             AUTO_INCREMENT     PRIMARY KEY   # 商品ID，自增长主键
+# name          VARCHAR(255)    NOT NULL                         # 商品名称
+# cost_price    DECIMAL(10, 2)  NOT NULL                         # 商品成本价
+# sale_price    DECIMAL(10, 2)  NOT NULL                         # 商品销售价
+# image_url     VARCHAR(255)                                     # 商品图片URL
+# category_id   INT             NOT NULL           FOREIGN KEY REFERENCES categories(id) # 商品所属分类ID，外键关联categories表
+# quantity      INT             NOT NULL           DEFAULT 0    # 商品库存数量，默认为0
+# created_at    TIMESTAMP       DEFAULT CURRENT_TIMESTAMP        # 创建时间
+# updated_at    TIMESTAMP       DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP # 更新时间
+
+CREATE TABLE products (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    cost_price DECIMAL(10, 2) NOT NULL,
+    sale_price DECIMAL(10, 2) NOT NULL,
+    image_url VARCHAR(255),
+    category_id INT NOT NULL,
+    quantity INT NOT NULL DEFAULT 0,
+    sold_quantity INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (category_id) REFERENCES categories(id)
+);
+
+
+# users 表 (用户)
+# ----------------------------------------------------------------------------------
+# id            INT             AUTO_INCREMENT     PRIMARY KEY   # 用户ID，自增长主键
+# name          VARCHAR(255)    NOT NULL                         # 用户名
+# phone_number  VARCHAR(20)     NOT NULL           UNIQUE        # 用户手机号码，唯一
+# created_at    TIMESTAMP       DEFAULT CURRENT_TIMESTAMP        # 创建时间
+# updated_at    TIMESTAMP       DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP # 更新时间
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    phone_number VARCHAR(20) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+# coupons 表 (优惠券)
+# ----------------------------------------------------------------------------------
+# id             INT             AUTO_INCREMENT     PRIMARY KEY   # 优惠券ID，自增长主键
+# code           VARCHAR(255)    NOT NULL           UNIQUE        # 优惠券代码，唯一
+# discount_type  ENUM('percentage', 'fixed') NOT NULL               # 优惠类型，'percentage'(百分比)或'fixed'(固定金额)
+# discount_value DECIMAL(10, 2)  NOT NULL                         # 优惠值，例如0.1表示10%折扣，或10表示减10元
+# min_order_amount DECIMAL(10, 2)                                   # 最低订单金额，达到此金额才能使用优惠券
+# start_date     DATE                                             # 优惠券开始日期
+# end_date       DATE                                             # 优惠券结束日期
+# created_at     TIMESTAMP       DEFAULT CURRENT_TIMESTAMP        # 创建时间
+# updated_at     TIMESTAMP       DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP # 更新时间
+
+CREATE TABLE coupons (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(255) NOT NULL UNIQUE,
+    discount_type ENUM('percentage', 'fixed') NOT NULL,
+    discount_value DECIMAL(10, 2) NOT NULL,
+    min_order_amount DECIMAL(10, 2),
+    start_date DATE,
+    end_date DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+# orders 表 (订单)
+# ----------------------------------------------------------------------------------
+# id             INT             AUTO_INCREMENT     PRIMARY KEY   # 订单ID，自增长主键
+# user_id        INT             NOT NULL           FOREIGN KEY REFERENCES users(id) # 下单用户ID，外键关联users表
+# user_name      VARCHAR(255)    NOT NULL                         # 下单用户姓名
+# order_date     TIMESTAMP       DEFAULT CURRENT_TIMESTAMP        # 下单时间
+# total_amount   DECIMAL(10, 2)  NOT NULL                         # 订单总金额（未折扣）
+# coupon_id      INT                           FOREIGN KEY REFERENCES coupons(id) # 使用的优惠券ID，外键关联coupons表，允许为空
+# discount_amount DECIMAL(10, 2)                                  # 优惠金额
+# final_amount   DECIMAL(10, 2)  NOT NULL                         # 订单最终金额（折扣后）
+# created_at     TIMESTAMP       DEFAULT CURRENT_TIMESTAMP        # 创建时间
+# updated_at     TIMESTAMP       DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP # 更新时间
+
+CREATE TABLE orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    user_name VARCHAR(255) NOT NULL,
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    coupon_id INT,
+    discount_amount DECIMAL(10, 2),
+    final_amount DECIMAL(10, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+     FOREIGN KEY (user_id) REFERENCES users(id),
+     FOREIGN KEY (coupon_id) REFERENCES coupons(id)
+);
+
+
+# order_items 表 (订单商品)
+# ----------------------------------------------------------------------------------
+# id             INT             AUTO_INCREMENT     PRIMARY KEY   # 订单商品ID，自增长主键
+# order_id       INT             NOT NULL           FOREIGN KEY REFERENCES orders(id) # 所属订单ID，外键关联orders表
+# product_id     INT             NOT NULL           FOREIGN KEY REFERENCES products(id) # 商品ID，外键关联products表
+# quantity       INT             NOT NULL                         # 商品数量
+# price          DECIMAL(10, 2)  NOT NULL                         # 商品单价（下单时的价格）
+# created_at     TIMESTAMP       DEFAULT CURRENT_TIMESTAMP        # 创建时间
+# updated_at     TIMESTAMP       DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP # 更新时间
+
+CREATE TABLE order_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES orders(id),
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+
+# statistics 表 (统计数据)
+# ----------------------------------------------------------------------------------
+# id               INT             AUTO_INCREMENT     PRIMARY KEY   # 统计ID，自增长主键
+# report_date      DATE            NOT NULL           UNIQUE        # 统计报表日期，唯一
+# total_orders     INT             NOT NULL                         # 订单总数
+# min_order_amount DECIMAL(10, 2)                                   # 最小订单金额
+# max_order_amount DECIMAL(10, 2)                                   # 最大订单金额
+# avg_order_amount DECIMAL(10, 2)                                   # 平均订单金额
+# first_order_time TIMESTAMP                                        # 最早订单时间
+# last_order_time  TIMESTAMP                                        # 最晚订单时间
+# total_revenue    DECIMAL(10, 2)  NOT NULL                         # 总销售额
+# total_cost       DECIMAL(10, 2)  NOT NULL                         # 总成本
+# total_profit     DECIMAL(10, 2)  NOT NULL                         # 总利润
+# created_at     TIMESTAMP       DEFAULT CURRENT_TIMESTAMP        # 创建时间
+# updated_at     TIMESTAMP       DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP # 更新时间
+
+CREATE TABLE statistics (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    report_date DATE NOT NULL UNIQUE,
+    total_orders INT NOT NULL,
+    min_order_amount DECIMAL(10, 2),
+    max_order_amount DECIMAL(10, 2),
+    avg_order_amount DECIMAL(10, 2),
+    first_order_time TIMESTAMP,
+    last_order_time TIMESTAMP,
+    total_revenue DECIMAL(10, 2) NOT NULL,
+    total_cost DECIMAL(10, 2) NOT NULL,
+    total_profit DECIMAL(10, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+# purchases 表 (采购)
+# ----------------------------------------------------------------------------------
+# id             INT             AUTO_INCREMENT     PRIMARY KEY   # 采购ID，自增长主键
+# product_id     INT             NOT NULL           FOREIGN KEY REFERENCES products(id) # 采购商品ID，外键关联products表
+# quantity       INT             NOT NULL                         # 采购数量
+# purchase_price DECIMAL(10, 2)  NOT NULL                         # 采购单价
+# purchase_date  TIMESTAMP       DEFAULT CURRENT_TIMESTAMP        # 采购时间
+# created_at     TIMESTAMP       DEFAULT CURRENT_TIMESTAMP        # 创建时间
+# updated_at     TIMESTAMP       DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP # 更新时间
+
+CREATE TABLE purchases (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT NOT NULL,
+    quantity INT NOT NULL,
+    purchase_price DECIMAL(10, 2) NOT NULL,
+    purchase_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);

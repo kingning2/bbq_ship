@@ -1,0 +1,157 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #2b2b2b 0%, #1a1a1a 100%);
+  padding: 12px;
+
+  .loginBox {
+    width: 100%;
+    max-width: 400px;
+    background: #fff;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+
+    @media screen and (max-width: 576px) {
+      max-width: 320px;
+      padding: 20px 16px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 24px;
+      font-size: 24px;
+      font-weight: bold;
+
+      @media screen and (max-width: 576px) {
+        font-size: 20px;
+        margin-bottom: 20px;
+      }
+    }
+
+    .roleLabel {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      a {
+        font-size: 13px;
+        color: #D4AF37;
+      }
+    }
+
+    :global {
+      .adm-form {
+        .adm-list {
+          --border-inner: none;
+          --border-top: none;
+          --border-bottom: none;
+        }
+
+        .adm-list-item {
+          padding: 0;
+          background: transparent;
+          margin-bottom: 16px;
+
+          @media screen and (max-width: 576px) {
+            margin-bottom: 12px;
+          }
+
+          .adm-list-item-content {
+            padding: 0;
+            border-bottom: none;
+          }
+        }
+
+        .adm-input {
+          width: 90%;
+          height: 40px;
+          font-size: 14px;
+          border: 1px solid #d9d9d9;
+          border-radius: 4px;
+          padding: 4px 12px;
+
+          @media screen and (max-width: 576px) {
+            height: 36px;
+            font-size: 13px;
+          }
+
+          &:focus {
+            border-color: #D4AF37;
+            box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+          }
+        }
+
+        .adm-button {
+          height: 40px;
+          font-size: 16px;
+          border-radius: 4px;
+          margin-top: 24px;
+          background: #D4AF37;
+          border: none;
+
+          @media screen and (max-width: 576px) {
+            height: 36px;
+            font-size: 15px;
+            margin-top: 20px;
+          }
+
+          &:active {
+            background: darken(#D4AF37, 10%);
+          }
+
+          &[disabled] {
+            opacity: 0.6;
+          }
+        }
+
+        .adm-form-item-label {
+          font-size: 14px;
+          color: #333;
+          margin-bottom: 8px;
+          font-weight: 500;
+
+          @media screen and (max-width: 576px) {
+            font-size: 13px;
+            margin-bottom: 6px;
+          }
+        }
+
+        .adm-form-item-required-asterisk {
+          color: #ff4d4f;
+        }
+
+        .adm-form-item-feedback {
+          margin-top: 4px;
+          font-size: 12px;
+
+          @media screen and (max-width: 576px) {
+            font-size: 11px;
+          }
+        }
+
+        .adm-radio-group {
+          .adm-space {
+            gap: 24px !important;
+
+            @media screen and (max-width: 576px) {
+              gap: 16px !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+:global {
+  .adm-button {
+
+    &.adm-button-fill-none {
+      color: #1a1a1a !important;
+    }
+  }
+}

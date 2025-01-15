@@ -1,0 +1,40 @@
+{
+  "name": "bbq-order-system-frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.5.2",
+    "@lucky-canvas/react": "^0.1.13",
+    "@reduxjs/toolkit": "^2.5.0",
+    "antd": "^5.23.0",
+    "antd-mobile": "^5.38.1",
+    "antd-mobile-icons": "^0.3.0",
+    "axios": "^1.7.9",
+    "dayjs": "^1.11.13",
+    "less": "^4.2.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-redux": "^9.2.0",
+    "react-router-dom": "^7.1.1",
+    "socket.io-client": "^4.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react-swc": "^3.5.0",
+    "eslint": "^9.17.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.16",
+    "less-loader": "^12.2.0",
+    "typescript": "~5.3.3",
+    "vite": "^5.1.4"
+  }
+}

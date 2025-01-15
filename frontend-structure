@@ -1,0 +1,54 @@
+frontend/
+├── src/
+│   ├── apis/
+│   │   ├── auth.ts
+│   │   ├── product.ts
+│   │   ├── order.ts
+│   │   ├── coupon.ts
+│   │   └── purchase.ts
+│   ├── components/
+│   │   ├── common/
+│   │   ├── business/
+│   │   └── customer/
+│   ├── pages/
+│   │   ├── business/
+│   │   │   ├── login/
+│   │   │   ├── product/
+│   │   │   ├── order/
+│   │   │   ├── coupon/
+│   │   │   ├── purchase/
+│   │   │   └── statistics/
+│   │   └── customer/
+│   │       ├── login/
+│   │       ├── menu/
+│   │       ├── cart/
+│   │       ├── order/
+│   │       ├── coupon/
+│   │       └── profile/
+│   ├── mobile/
+│   │   └── customer/
+│   │       ├── login/
+│   │       ├── menu/
+│   │       ├── cart/
+│   │       ├── order/
+│   │       ├── coupon/
+│   │       └── profile/
+│   ├── routes/
+│   │   ├── index.tsx
+│   │   ├── business.tsx
+│   │   └── customer.tsx
+│   ├── store/
+│   │   ├── index.ts
+│   │   └── slices/
+│   ├── styles/
+│   │   ├── variables.less
+│   │   └── global.less
+│   ├── types/
+│   │   ├── auth.ts
+│   │   ├── product.ts
+│   │   ├── order.ts
+│   │   └── common.ts
+│   └── utils/
+│       ├── request.ts
+│       ├── auth.ts
+│       └── helper.ts 

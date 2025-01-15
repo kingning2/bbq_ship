@@ -1,0 +1,203 @@
+.container {
+  padding: 12px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+:global(.adm-list-item-content) {
+  padding: 0;
+}
+
+.orderItem {
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #fff;
+  border: 1px solid #d4af37;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+}
+
+.orderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background-color: #1a1a1a;
+  color: #d4af37;
+}
+
+.orderNoWrapper {
+  .orderNo {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .orderTime {
+    font-size: 12px;
+    margin-top: 4px;
+    color: #f5deb3;
+  }
+}
+
+.orderInfo {
+  padding: 12px;
+}
+
+.items {
+  .item {
+    display: flex;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f5deb3;
+
+    &:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+  }
+
+  .itemImage {
+    margin-right: 12px;
+  }
+
+  .itemContent {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .itemLeft {
+    display: flex;
+    flex-direction: column;
+
+    .name {
+      font-size: 14px;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+    }
+
+    .price {
+      font-size: 14px;
+      color: #d4af37;
+    }
+  }
+
+  .itemRight {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
+    .quantity {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+
+    .subtotal {
+      font-size: 14px;
+      color: #d4af37;
+      font-weight: 500;
+    }
+  }
+}
+
+.amount {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f5deb3;
+}
+
+.total {
+  font-size: 14px;
+  color: #666;
+}
+
+.priceInfo {
+  margin-top: 8px;
+
+  .originalPrice {
+    font-size: 14px;
+    color: #666;
+  }
+
+  .discountPrice {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4px;
+    font-size: 14px;
+
+    .couponName {
+      color: #d4af37;
+    }
+
+    .discountAmount {
+      color: #f84945;
+    }
+  }
+
+  .finalPrice {
+    margin-top: 4px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #d4af37;
+    text-align: right;
+  }
+}
+
+.remark, .address {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #666;
+  padding: 8px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  border-left: 3px solid #d4af37;
+}
+
+:global {
+  .adm-tag-warning {
+    color: #d4af37;
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid #d4af37;
+  }
+
+  .adm-tag-primary {
+    color: #1677ff;
+    background: rgba(22, 119, 255, 0.1);
+    border: 1px solid #1677ff;
+  }
+
+  .adm-tag-success {
+    color: #00b578;
+    background: rgba(0, 181, 120, 0.1);
+    border: 1px solid #00b578;
+  }
+
+  .adm-tag-danger {
+    color: #ff3141;
+    background: rgba(255, 49, 65, 0.1);
+    border: 1px solid #ff3141;
+  }
+}
+
+.actions {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f5deb3;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+
+  :global {
+    .adm-button {
+      min-width: 80px;
+    }
+  }
+} 

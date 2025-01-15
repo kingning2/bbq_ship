@@ -1,0 +1,84 @@
+.luckyWheel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background: #1a1a1a;
+  border-radius: 16px;
+
+  .wheelContainer {
+    width: 300px;
+    height: 300px;
+    margin-bottom: 20px;
+    background: #1a1a1a;
+    border-radius: 8px;
+  }
+
+  .buttonGroup {
+    display: flex;
+    gap: 12px;
+    margin: 10px 0;
+  }
+
+  .prizeButton {
+    padding: 8px 24px;
+    border: 1px solid #D4AF37;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: transparent;
+    color: #D4AF37;
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+}
+
+.prizeList {
+  padding: 20px;
+  background: #1a1a1a;
+  border-radius: 12px;
+
+  .title {
+    color: #D4AF37;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+
+  .items {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+
+    .item {
+      padding: 12px;
+      background: rgba(212, 175, 55, 0.1);
+      border-radius: 8px;
+      text-align: center;
+      color: #fff;
+      font-size: 14px;
+
+      .probability {
+        color: #D4AF37;
+        font-size: 12px;
+        margin-top: 4px;
+      }
+    }
+  }
+}
+
+:global {
+  .adm-modal-body:not(.adm-modal-with-image) {
+    background-color: transparent;
+    padding: 0;
+  }
+  .adm-modal-content {
+    background: transparent !important;
+    padding: 0;
+  }
+} 

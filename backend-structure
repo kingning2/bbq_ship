@@ -1,0 +1,37 @@
+backend/
+├── src/
+│   ├── config/
+│   │   ├── database.config.ts
+│   │   └── jwt.config.ts
+│   ├── controllers/
+│   │   ├── auth.controller.ts
+│   │   ├── product.controller.ts
+│   │   ├── order.controller.ts
+│   │   ├── coupon.controller.ts
+│   │   └── purchase.controller.ts
+│   ├── dto/
+│   │   ├── auth.dto.ts
+│   │   ├── product.dto.ts
+│   │   ├── order.dto.ts
+│   │   └── common.dto.ts
+│   ├── entities/
+│   │   ├── user.entity.ts
+│   │   ├── product.entity.ts
+│   │   ├── order.entity.ts
+│   │   └── coupon.entity.ts
+│   ├── middleware/
+│   │   ├── auth.middleware.ts
+│   │   └── role.middleware.ts
+│   ├── modules/
+│   │   ├── auth.module.ts
+│   │   ├── product.module.ts
+│   │   ├── order.module.ts
+│   │   └── coupon.module.ts
+│   ├── services/
+│   │   ├── auth.service.ts
+│   │   ├── product.service.ts
+│   │   ├── order.service.ts
+│   │   └── coupon.service.ts
+│   └── utils/
+│       ├── response.ts
+│       └── helper.ts 

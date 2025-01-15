@@ -1,0 +1,98 @@
+.layout {
+  height: 100vh;
+  overflow: hidden;
+
+  .logo {
+    height: 32px;
+    margin: 16px;
+    color: #D4AF37;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 32px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .headerContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 24px;
+
+    .trigger {
+      padding: 0 24px;
+      font-size: 18px;
+      line-height: 64px;
+      cursor: pointer;
+      transition: color 0.3s;
+
+      &:hover {
+        color: #D4AF37;
+      }
+    }
+
+    .userInfo {
+      .userDropdown {
+        cursor: pointer;
+        padding: 0 4px;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.025);
+        }
+
+        .username {
+          font-size: 14px;
+          color: rgba(0, 0, 0, 0.85);
+          margin-left: 8px;
+        }
+      }
+    }
+  }
+
+  .content {
+    margin: 24px 16px;
+    padding: 24px;
+    background: #fff;
+    border-radius: 4px;
+    overflow: auto;
+    flex: 1;
+    height: calc(100vh - 112px);
+  }
+
+  :global {
+    .ant-layout {
+      height: 100vh;
+    }
+
+    .ant-layout-sider {
+      height: 100vh;
+      background: #001529;
+      overflow: auto;
+
+      .ant-menu-item-selected {
+        background-color: #D4AF37 !important;
+      }
+    }
+
+    .ant-layout-content {
+      overflow: hidden;
+    }
+
+    .ant-modal {
+      .ant-modal-header {
+        margin-bottom: 24px;
+      }
+
+      .ant-form-item {
+        margin-bottom: 24px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+} 
