@@ -14,14 +14,16 @@ import { OrderGateway } from '../gateways/order.gateway';
 export class OrderService {
   constructor(
     @InjectRepository(Order)
-    private orderRepository: Repository<Order>,
+    private readonly orderRepository: Repository<Order>,
     @InjectRepository(OrderItem)
-    private orderItemRepository: Repository<OrderItem>,
+    private readonly orderItemRepository: Repository<OrderItem>,
     @InjectRepository(Product)
-    private productRepository: Repository<Product>,
+    private readonly productRepository: Repository<Product>,
     @InjectRepository(Coupon)
-    private couponRepository: Repository<Coupon>,
-    private dataSource: DataSource,
+    private readonly couponRepository: Repository<Coupon>,
+    @InjectRepository(UserCoupon)
+    private readonly userCouponRepository: Repository<UserCoupon>,
+    private readonly dataSource: DataSource,
     private readonly orderGateway: OrderGateway,
   ) {}
 

@@ -54,4 +54,13 @@ export class Product {
 
   @Column({ name: 'sold_quantity', default: 0 })
   soldQuantity: number;
+
+  @Column({
+    name: 'cost_price',
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+  })
+  costPrice: number;
 }

@@ -182,7 +182,6 @@ const OrdersPage: React.FC = () => {
         ) : (
           <List>
             {orders.map((order) => {
-              console.log(order);
               
               return <List.Item key={order.id} className={styles.orderItem}>
               <div className={styles.orderHeader}>

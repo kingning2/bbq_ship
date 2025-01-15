@@ -9,6 +9,7 @@ import {
   Empty,
   Toast,
   Tag,
+  ImageViewer
 } from 'antd-mobile';
 import { DeleteOutline } from 'antd-mobile-icons';
 import { useNavigate } from 'react-router-dom';
@@ -24,6 +25,8 @@ const OrderPage: React.FC = () => {
   const [cartVisible, setCartVisible] = useState(false);
   const [cart, setCart] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [currentImage, setCurrentImage] = useState<any[]>([]);
+  const [visible, setVisible] = useState(false);
 
   // 加载分类和商品数据
   useEffect(() => {
@@ -60,6 +63,13 @@ const OrderPage: React.FC = () => {
 
   // 添加到购物车
   const addToCart = (product: any) => {
+    if (product.stock - product.soldQuantity === 0) {
+      Toast.show({
+        icon: 'fail',
+        content: '已售罄',
+      });
+      return;
+    }
     setCart((prev) => {
       const existing = prev.find((item) => item.id === product.id);
       if (existing) {
@@ -156,6 +166,12 @@ const OrderPage: React.FC = () => {
                 src={product.image}
                 alt={product.name}
                 className={styles.productImage}
+                onClick={() => {
+                  console.log(product.image);
+                  
+                  setCurrentImage([product.image])
+                  setVisible(true)
+                }}
               />
               <div className={styles.productInfo}>
                 <div className={styles.productName}>{product.name}</div>
@@ -170,8 +186,8 @@ const OrderPage: React.FC = () => {
                 </div>
                 <div className={styles.productStats}>
                   <span className={styles.sales}>已售 {product.salesCount || 0}</span>
-                  <span className={`${styles.stock} ${product.stock > 10 ? styles.sufficient : styles.insufficient}`}>
-                    {product.stock > 10 ? '库存充足' : `剩余 ${product.stock} 份`}
+                  <span className={`${styles.stock} ${product.stock - product.soldQuantity > 10 ? styles.sufficient : styles.insufficient}`}>
+                    {product.stock - product.soldQuantity > 10 ? '库存充足' : `剩余 ${product.stock - product.soldQuantity} 份`}
                   </span>
                 </div>
                 <div className={styles.productAction}>
@@ -187,9 +203,9 @@ const OrderPage: React.FC = () => {
                       color="primary"
                       size="small"
                       onClick={() => addToCart(product)}
-                      disabled={product.stock === 0}
+                      disabled={product.stock - product.soldQuantity === 0}
                     >
-                      {product.stock === 0 ? '已售罄' : '加入购物车'}
+                      {product.stock - product.soldQuantity === 0 ? '已售罄' : '加入购物车'}
                     </Button>
                   )}
                 </div>
@@ -279,6 +295,14 @@ const OrderPage: React.FC = () => {
           </div>
         </div>
       </Popup>
+      <ImageViewer.Multi
+        images={currentImage}
+        visible={visible}
+        defaultIndex={0}
+        onClose={() => {
+          setVisible(false)
+        }}
+      />
     </div>
   );
 };

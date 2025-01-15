@@ -9,23 +9,22 @@ import { CreatePurchaseDto, PurchaseQueryDto } from '../dto/purchase.dto';
 export class PurchaseService {
   constructor(
     @InjectRepository(Purchase)
-    private purchaseRepository: Repository<Purchase>,
+    private readonly purchaseRepository: Repository<Purchase>,
     @InjectRepository(Product)
-    private productRepository: Repository<Product>,
-    private dataSource: DataSource,
+    private readonly productRepository: Repository<Product>,
+    private readonly dataSource: DataSource,
   ) {}
 
   async create(createPurchaseDto: CreatePurchaseDto) {
-    // 开启事务
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      // 检查商品是否存在
+      // 查找商品
       const product = await queryRunner.manager.findOne(Product, {
         where: { id: createPurchaseDto.productId },
-        lock: { mode: 'pessimistic_write' }, // 使用悲观锁防止并发问题
+        lock: { mode: 'pessimistic_write' },
       });
 
       if (!product) {
@@ -33,24 +32,28 @@ export class PurchaseService {
       }
 
       // 创建采购记录
-      const purchase = await queryRunner.manager.save(
-        Purchase,
-        createPurchaseDto,
-      );
+      const purchase = await queryRunner.manager.save(Purchase, {
+        ...createPurchaseDto,
+        totalAmount: createPurchaseDto.price * createPurchaseDto.quantity,
+      });
 
-      // 更新商品库存
+      // 更新商品库存和成本价
       product.stock += createPurchaseDto.quantity;
-      await queryRunner.manager.save(Product, product);
+      // 更新成本价为最新的采购价
+      product.costPrice = createPurchaseDto.price;
+      await queryRunner.manager.save(product);
 
-      // 提交事务
       await queryRunner.commitTransaction();
-      return purchase;
+
+      return {
+        code: 200,
+        message: '采购成功',
+        data: purchase,
+      };
     } catch (err) {
-      // 回滚事务
       await queryRunner.rollbackTransaction();
       throw err;
     } finally {
-      // 释放资源
       await queryRunner.release();
     }
   }

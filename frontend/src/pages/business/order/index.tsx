@@ -71,8 +71,7 @@ const OrderManage: React.FC = () => {
       align: 'center',
       render: (_, record) => (
         <Space direction="vertical" size={0}>
-          <div>{record.user.username}</div>
-          <div style={{ color: '#666' }}>{record.user.phone || '--'}</div>
+          <div>{record.user.phone}</div>
         </Space>
       ),
     },
@@ -155,6 +154,7 @@ const OrderManage: React.FC = () => {
       key: 'createdAt',
       align: 'center',
       width: 180,
+      render: (text) => dayjs(text).format('YYYY-MM-DD HH:mm:ss'),
     },
     {
       title: '操作',
