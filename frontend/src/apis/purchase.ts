@@ -6,8 +6,16 @@ export const getPurchaseList = (params: PurchaseParams) => {
   return request.get('/purchase', { params });
 };
 
+export interface CreatePurchaseDto {
+  productId: number;
+  quantity: number;
+  price: number;
+  supplier: string;
+  remark?: string;
+}
+
 // 创建采购记录
-export const createPurchase = (data: Partial<PurchaseItem>) => {
+export const createPurchase = (data: CreatePurchaseDto) => {
   return request.post('/purchase', data);
 };
 

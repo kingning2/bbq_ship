@@ -31,7 +31,7 @@ export class OrderService {
     await queryRunner.startTransaction();
 
     try {
-      // 1. 检查并更新商品库存
+      // 1. 检查商品库存
       let originalAmount = 0;
       for (const item of createOrderDto.items) {
         const product = await queryRunner.manager.findOne(Product, {
@@ -43,13 +43,13 @@ export class OrderService {
           throw new BadRequestException(`商品ID ${item.productId} 不存在`);
         }
 
-        if (product.stock < item.quantity) {
+        // 计算剩余可售数量（总库存 - 已售数量）
+        const availableStock = product.stock - product.soldQuantity;
+        if (availableStock < item.quantity) {
           throw new BadRequestException(`商品 ${product.name} 库存不足`);
         }
 
-        // 减少库存
-        product.stock -= item.quantity;
-        // 增加销量
+        // 增加已售数量
         product.soldQuantity += item.quantity;
         await queryRunner.manager.save(product);
 
@@ -75,11 +75,11 @@ export class OrderService {
       }
 
       // 3. 创建订单
-      const order = this.orderRepository.create({
+      const order = await queryRunner.manager.save(Order, {
+        userId,
         orderNo: `ORDER${Date.now()}${Math.floor(Math.random() * 1000)
           .toString()
           .padStart(3, '0')}`,
-        userId,
         status: OrderStatus.PENDING,
         originalAmount,
         discountAmount,
@@ -90,29 +90,33 @@ export class OrderService {
         address: createOrderDto.address,
       });
 
-      await queryRunner.manager.save(order);
-
       // 4. 创建订单项
-      for (const item of createOrderDto.items) {
-        const orderItem = this.orderItemRepository.create({
-          orderId: order.id,
-          productId: item.productId,
-          quantity: item.quantity,
-          price: item.price,
-        });
-        await queryRunner.manager.save(orderItem);
-      }
+      const orderItems = await Promise.all(
+        createOrderDto.items.map((item) =>
+          queryRunner.manager.save(OrderItem, {
+            orderId: order.id,
+            productId: item.productId,
+            quantity: item.quantity,
+            price: item.price,
+          }),
+        ),
+      );
 
       await queryRunner.commitTransaction();
 
-      // 创建订单成功后发送通知
-      this.orderGateway.notifyNewOrder(order);
-      this.orderGateway.notifyOrderUpdate(userId, order);
+      // 通知商家有新订单
+      this.orderGateway.notifyNewOrder({
+        ...order,
+        items: orderItems,
+        user: { id: userId },
+      });
 
       return {
         code: 200,
         message: '创建订单成功',
-        data: order,
+        data: {
+          orderId: order.id,
+        },
       };
     } catch (err) {
       await queryRunner.rollbackTransaction();
@@ -197,7 +201,7 @@ export class OrderService {
         throw new BadRequestException('只能取消待处理的订单');
       }
 
-      // 恢复商品库存
+      // 恢复商品已售数量
       for (const item of order.orderItems) {
         const product = await queryRunner.manager.findOne(Product, {
           where: { id: item.productId },
@@ -205,10 +209,11 @@ export class OrderService {
         });
 
         if (product) {
-          // 增加库存
-          product.stock += item.quantity;
-          // 减少销量
-          product.soldQuantity -= item.quantity;
+          // 减少已售数量
+          product.soldQuantity = Math.max(
+            0,
+            product.soldQuantity - item.quantity,
+          );
           await queryRunner.manager.save(product);
         }
       }
@@ -331,35 +336,82 @@ export class OrderService {
   }
 
   async updateStatus(orderId: number, status: OrderStatus) {
-    const order = await this.orderRepository.findOne({
-      where: { id: orderId },
-      relations: ['orderItems'],
-    });
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    if (!order) {
-      throw new BadRequestException('订单不存在');
+    try {
+      const order = await queryRunner.manager.findOne(Order, {
+        where: { id: orderId },
+        relations: ['orderItems', 'orderItems.product'],
+      });
+
+      if (!order) {
+        throw new BadRequestException('订单不存在');
+      }
+
+      // 检查状态转换是否合法
+      const validTransitions = {
+        [OrderStatus.PENDING]: [OrderStatus.PROCESSING, OrderStatus.CANCELLED],
+        [OrderStatus.PROCESSING]: [OrderStatus.COMPLETED],
+      };
+
+      if (!validTransitions[order.status]?.includes(status)) {
+        throw new BadRequestException('非法的状态转换');
+      }
+
+      // 如果订单取消，恢复商品已售数量
+      if (status === OrderStatus.CANCELLED) {
+        for (const item of order.orderItems) {
+          const product = await queryRunner.manager.findOne(Product, {
+            where: { id: item.productId },
+            lock: { mode: 'pessimistic_write' },
+          });
+
+          if (product) {
+            // 减少已售数量
+            product.soldQuantity = Math.max(
+              0,
+              product.soldQuantity - item.quantity,
+            );
+            await queryRunner.manager.save(product);
+          }
+        }
+
+        // 如果使用了优惠券，恢复优惠券
+        if (order.couponId) {
+          const userCoupon = await queryRunner.manager.findOne(UserCoupon, {
+            where: {
+              userId: order.userId,
+              couponId: order.couponId,
+              isUsed: true,
+            },
+          });
+
+          if (userCoupon) {
+            userCoupon.isUsed = false;
+            await queryRunner.manager.save(userCoupon);
+          }
+        }
+      }
+
+      order.status = status;
+      await queryRunner.manager.save(order);
+      await queryRunner.commitTransaction();
+
+      // 通知相关用户
+      this.orderGateway.notifyOrderUpdate(order.userId, order);
+
+      return {
+        code: 200,
+        message: '更新状态成功',
+        data: null,
+      };
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
     }
-
-    // 检查状态转换是否合法
-    const validTransitions = {
-      [OrderStatus.PENDING]: [OrderStatus.PROCESSING, OrderStatus.CANCELLED],
-      [OrderStatus.PROCESSING]: [OrderStatus.COMPLETED],
-    };
-
-    if (!validTransitions[order.status]?.includes(status)) {
-      throw new BadRequestException('非法的状态转换');
-    }
-
-    order.status = status;
-    await this.orderRepository.save(order);
-
-    // 通知相关用户
-    this.orderGateway.notifyOrderUpdate(order.userId, order);
-
-    return {
-      code: 200,
-      message: '更新状态成功',
-      data: null,
-    };
   }
 }

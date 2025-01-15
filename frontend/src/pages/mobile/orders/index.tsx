@@ -64,13 +64,7 @@ const OrdersPage: React.FC = () => {
     loadData();
   }, []);
 
-  const handleOrderUpdate = useCallback((updatedOrder: Order) => {
-    setOrders(prev => prev.map(order => 
-      order.id === updatedOrder.id ? updatedOrder : order
-    ));
-  }, []);
-
-  useOrderSocket(handleOrderUpdate);
+  useOrderSocket(loadData);
 
   const getStatusTag = (status: Order['status']) => {
     const statusMap = {
@@ -187,35 +181,37 @@ const OrdersPage: React.FC = () => {
           <Empty description="暂无订单" />
         ) : (
           <List>
-            {orders.map((order) => (
-              <List.Item key={order.id} className={styles.orderItem}>
-                <div className={styles.orderHeader}>
-                  <div className={styles.orderNoWrapper}>
-                    <div className={styles.orderNo}>订单号：{order.orderNo}</div>
-                    <div className={styles.orderTime}>
-                      {dayjs(order.createdAt).format('YYYY-MM-DD HH:mm:ss')}
-                    </div>
+            {orders.map((order) => {
+              console.log(order);
+              
+              return <List.Item key={order.id} className={styles.orderItem}>
+              <div className={styles.orderHeader}>
+                <div className={styles.orderNoWrapper}>
+                  <div className={styles.orderNo}>订单号：{order.orderNo}</div>
+                  <div className={styles.orderTime}>
+                    {dayjs(order.createdAt).format('YYYY-MM-DD HH:mm:ss')}
                   </div>
-                  {getStatusTag(order.status)}
                 </div>
-                <div className={styles.orderInfo}>
-                  {renderOrderItems(order.items)}
-                  <div className={styles.amount}>
-                    <span className={styles.total}>
-                      共{order.items.reduce((sum, item) => sum + item.quantity, 0)}件
-                    </span>
-                    {renderPriceInfo(order)}
-                  </div>
-                  {order.remark && (
-                    <div className={styles.remark}>备注：{order.remark}</div>
-                  )}
-                  {order.deliveryType === 'delivery' && order.address && (
-                    <div className={styles.address}>配送地址：{order.address}</div>
-                  )}
-                  {renderOrderActions(order)}
+                {getStatusTag(order.status)}
+              </div>
+              <div className={styles.orderInfo}>
+                {renderOrderItems(order.items)}
+                <div className={styles.amount}>
+                  <span className={styles.total}>
+                    共{order.items.reduce((sum, item) => sum + item.quantity, 0)}件
+                  </span>
+                  {renderPriceInfo(order)}
                 </div>
-              </List.Item>
-            ))}
+                {order.remark && (
+                  <div className={styles.remark}>备注：{order.remark}</div>
+                )}
+                {order.deliveryType === 'delivery' && order.address && (
+                  <div className={styles.address}>配送地址：{order.address}</div>
+                )}
+                {renderOrderActions(order)}
+              </div>
+            </List.Item>
+            })}
           </List>
         )}
       </PullToRefresh>

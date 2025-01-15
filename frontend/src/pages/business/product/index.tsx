@@ -213,6 +213,8 @@ const ProductManage: React.FC = () => {
 
   // 处理编辑
   const handleEdit = (record: ProductItem) => {
+    console.log(record);
+    
     form.setFieldsValue({
       name: record.name,
       description: record.description,
@@ -223,6 +225,7 @@ const ProductManage: React.FC = () => {
       isHot: record.isHot,
     });
     setEditingId(record.id);
+    setPreviewUrl(record.image);
     setModalVisible(true);
   };
 
@@ -294,8 +297,11 @@ const ProductManage: React.FC = () => {
           return;
         }
       } else {
-        // 创建商品
-        const { data: res } = await createProduct(values);
+        // 创建商品，设置初始库存为0
+        const { data: res } = await createProduct({
+          ...values,
+          stock: 0,
+        });
         if (res.code === 200) {
           message.success('添加成功');
         } else {
@@ -345,65 +351,78 @@ const ProductManage: React.FC = () => {
       <Card
         title="商品管理"
         extra={
-          <Form
-            form={searchForm}
-            layout="inline"
-            className={styles.searchForm}
-            onFinish={handleSearch}
-          >
-            <Form.Item name="name" label="商品名称">
-              <Input
-                placeholder="请输入商品名称"
-                allowClear
-                style={{ width: 200 }}
-              />
-            </Form.Item>
-            <Form.Item name="categoryId" label="商品分类">
-              <Select
-                placeholder="请选择分类"
-                allowClear
-                style={{ width: 200 }}
-              >
-                {categories.map((category) => (
-                  <Option key={category.id} value={category.id}>
-                    {category.name}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item name="status" label="商品状态">
-              <Select
-                placeholder="请选择状态"
-                allowClear
-                style={{ width: 200 }}
-              >
-                <Option value="on">上架</Option>
-                <Option value="off">下架</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item name="isHot" label="是否热销">
-              <Select
-                placeholder="请选择"
-                allowClear
-                style={{ width: 200 }}
-              >
-                <Option value={true}>是</Option>
-                <Option value={false}>否</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item>
-              <Space>
-                <Button
-                  type="primary"
-                  icon={<SearchOutlined />}
-                  htmlType="submit"
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <Form
+              form={searchForm}
+              layout="inline"
+              className={styles.searchForm}
+              onFinish={handleSearch}
+            >
+              <Form.Item name="name" label="商品名称">
+                <Input
+                  placeholder="请输入商品名称"
+                  allowClear
+                  style={{ width: 200 }}
+                />
+              </Form.Item>
+              <Form.Item name="categoryId" label="商品分类">
+                <Select
+                  placeholder="请选择分类"
+                  allowClear
+                  style={{ width: 200 }}
                 >
-                  搜索
-                </Button>
-                <Button onClick={handleReset}>重置</Button>
-              </Space>
-            </Form.Item>
-          </Form>
+                  {categories.map((category) => (
+                    <Option key={category.id} value={category.id}>
+                      {category.name}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item name="status" label="商品状态">
+                <Select
+                  placeholder="请选择状态"
+                  allowClear
+                  style={{ width: 200 }}
+                >
+                  <Option value="on">上架</Option>
+                  <Option value="off">下架</Option>
+                </Select>
+              </Form.Item>
+              <Form.Item name="isHot" label="是否热销">
+                <Select
+                  placeholder="请选择"
+                  allowClear
+                  style={{ width: 200 }}
+                >
+                  <Option value={true}>是</Option>
+                  <Option value={false}>否</Option>
+                </Select>
+              </Form.Item>
+              <Form.Item>
+                <Space>
+                  <Button
+                    type="primary"
+                    icon={<SearchOutlined />}
+                    htmlType="submit"
+                  >
+                    搜索
+                  </Button>
+                  <Button onClick={handleReset}>重置</Button>
+                </Space>
+              </Form.Item>
+            </Form>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => {
+                setEditingId(null);
+                form.resetFields();
+                setModalVisible(true);
+              }}
+            >
+              添加商品
+            </Button>
+          </div>
         }
       >
         <Table
@@ -426,7 +445,7 @@ const ProductManage: React.FC = () => {
       </Card>
 
       <Modal
-        title="编辑商品"
+        title={editingId ? "编辑商品" : "添加商品"}
         open={modalVisible}
         onOk={handleSubmit}
         onCancel={() => {
@@ -438,14 +457,16 @@ const ProductManage: React.FC = () => {
         maskClosable={false}
         width={800}
       >
+            <Form form={form} layout="vertical">
         <div className={styles.editForm}>
           <div className={styles.imageSection}>
-            <Form.Item label="商品图片" className={styles.imageUrl}>
+            <Form.Item label="商品图片" name="image" className={styles.imageUrl}>
               <Input
                 placeholder="请输入商品图片URL"
                 onChange={handleImageChange}
                 value={previewUrl || form.getFieldValue('image')}
               />
+              <span></span>
             </Form.Item>
             <div className={styles.imagePreview}>
               <Image
@@ -455,10 +476,20 @@ const ProductManage: React.FC = () => {
                 className={styles.previewImage}
               />
             </div>
+            
+            <Form.Item name="status" label="商品状态" initialValue="off">
+                <Select>
+                  <Option value="on">上架</Option>
+                  <Option value="off">下架</Option>
+                </Select>
+              </Form.Item>
+
+              <Form.Item name="isHot" label="是否热销" valuePropName="checked" initialValue={false}>
+                <Switch checkedChildren="是" unCheckedChildren="否" />
+              </Form.Item>
           </div>
           
           <div className={styles.formSection}>
-            <Form form={form} layout="vertical">
               <Form.Item
                 name="name"
                 label="商品名称"
@@ -466,6 +497,7 @@ const ProductManage: React.FC = () => {
               >
                 <Input placeholder="请输入商品名称" />
               </Form.Item>
+
               <Form.Item name="description" label="商品描述">
                 <Input.TextArea
                   placeholder="请输入商品描述"
@@ -474,6 +506,7 @@ const ProductManage: React.FC = () => {
                   showCount
                 />
               </Form.Item>
+
               <Form.Item
                 name="categoryId"
                 label="商品分类"
@@ -487,18 +520,26 @@ const ProductManage: React.FC = () => {
                   ))}
                 </Select>
               </Form.Item>
-              <Form.Item name="status" label="商品状态">
-                <Select>
-                  <Option value="on">上架</Option>
-                  <Option value="off">下架</Option>
-                </Select>
+
+              <Form.Item
+                name="price"
+                label="商品价格"
+                rules={[
+                  { required: true, message: '请输入商品价格' },
+                ]}
+              >
+                <InputNumber
+                  min={0}
+                  precision={2}
+                  placeholder="请输入商品价格"
+                  style={{ width: '100%' }}
+                  addonAfter="元"
+                />
               </Form.Item>
-              <Form.Item name="isHot" label="是否热销" valuePropName="checked">
-                <Switch checkedChildren="是" unCheckedChildren="否" />
-              </Form.Item>
-            </Form>
+
           </div>
         </div>
+            </Form>
       </Modal>
     </div>
   );

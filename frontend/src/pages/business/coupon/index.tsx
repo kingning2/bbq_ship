@@ -229,7 +229,7 @@ const CouponManage: React.FC = () => {
           dataSource={data}
           rowKey="id"
           loading={loading}
-          scroll={{ x: 1200, y: 350 }}
+          scroll={{ y: 'calc(100vh - 350px)' }}
           pagination={{
             current: currentPage,
             pageSize,

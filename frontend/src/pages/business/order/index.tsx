@@ -67,9 +67,51 @@ const OrderManage: React.FC = () => {
     },
     {
       title: '顾客',
-      dataIndex: ['user', 'username'],
-      key: 'username',
+      key: 'user',
       align: 'center',
+      render: (_, record) => (
+        <Space direction="vertical" size={0}>
+          <div>{record.user.username}</div>
+          <div style={{ color: '#666' }}>{record.user.phone || '--'}</div>
+        </Space>
+      ),
+    },
+    {
+      title: '商品信息',
+      key: 'items',
+      align: 'center',
+      render: (_, record) => (
+        <div style={{ maxWidth: 300 }}>
+          {record.items.map((item, index) => (
+            <div key={item.id} style={{ 
+              display: 'flex', 
+              alignItems: 'center',
+              padding: '4px 0',
+              borderBottom: index === record.items.length - 1 ? 'none' : '1px solid #f0f0f0'
+            }}>
+              <Image
+                src={item.product.image}
+                alt={item.product.name}
+                width={40}
+                height={40}
+                style={{ objectFit: 'cover', marginRight: 8 }}
+              />
+              <div style={{ flex: 1, overflow: 'hidden' }}>
+                <div style={{ 
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}>
+                  {item.product.name}
+                </div>
+                <div style={{ color: '#666', fontSize: '12px' }}>
+                  ¥{item.price} × {item.quantity}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ),
     },
     {
       title: '商品总额',
@@ -268,10 +310,16 @@ const OrderManage: React.FC = () => {
                 {currentOrder.orderNo}
               </Descriptions.Item>
               <Descriptions.Item label="下单时间">
-                {currentOrder.createdAt}
+                {dayjs(currentOrder.createdAt).format('YYYY-MM-DD HH:mm:ss')}
               </Descriptions.Item>
-              <Descriptions.Item label="顾客">
-                {currentOrder.user.username}
+              <Descriptions.Item label="顾客信息" span={2}>
+                <Space direction="vertical" size={0}>
+                  <div>姓名：{currentOrder.user.username}</div>
+                  <div>电话：{currentOrder.user.phone || '--'}</div>
+                </Space>
+              </Descriptions.Item>
+              <Descriptions.Item label="配送方式">
+                {currentOrder.deliveryType === 'self' ? '自取' : '外卖配送'}
               </Descriptions.Item>
               <Descriptions.Item label="订单状态">
                 <Tag color={
@@ -292,11 +340,21 @@ const OrderManage: React.FC = () => {
                   }
                 </Tag>
               </Descriptions.Item>
+              {currentOrder.deliveryType === 'delivery' && (
+                <Descriptions.Item label="配送地址" span={2}>
+                  {currentOrder.address}
+                </Descriptions.Item>
+              )}
               <Descriptions.Item label="商品总额">
                 ¥{currentOrder.originalAmount}
               </Descriptions.Item>
               <Descriptions.Item label="优惠金额">
                 ¥{currentOrder.discountAmount}
+                {currentOrder.coupon && (
+                  <span style={{ marginLeft: 8, color: '#666' }}>
+                    ({currentOrder.coupon.name})
+                  </span>
+                )}
               </Descriptions.Item>
               <Descriptions.Item label="实付金额" span={2}>
                 <span style={{ color: '#f50', fontSize: '16px', fontWeight: 'bold' }}>
