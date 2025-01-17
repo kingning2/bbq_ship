@@ -20,7 +20,7 @@
       ]
     }
   ],
-  "buildCommand": "npm run build",
+  "buildCommand": "pnpm run build",
   "outputDirectory": "dist",
   "framework": "vite",
   "regions": ["hkg1"]
