@@ -14,6 +14,7 @@ import {
   message,
   Popconfirm,
   Image,
+  Checkbox,
 } from 'antd';
 import {
   PlusOutlined,
@@ -21,6 +22,7 @@ import {
   DeleteOutlined,
   SearchOutlined,
   UploadOutlined,
+  DownloadOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import {
@@ -35,12 +37,33 @@ import { getCategoryList } from '@/apis/category';
 import type { ProductItem } from '@/types/product';
 import type { CategoryItem } from '@/types/category';
 import styles from './index.module.less';
+import { exportToExcel } from '@/utils/export';
+import dayjs from 'dayjs';
 
 const { Option } = Select;
 
 interface ProductItem {
   soldQuantity: number;
 }
+
+// 添加导出字段配置类型
+interface ExportField {
+  key: string;
+  title: string;
+}
+
+const exportFields: ExportField[] = [
+  { key: 'name', title: '商品名称' },
+  { key: 'price', title: '价格' },
+  { key: 'stock', title: '库存' },
+  { key: 'soldQuantity', title: '已售' },
+  { key: 'availableStock', title: '可用库存' },
+  { key: 'costPrice', title: '成本价' },
+  { key: 'profit', title: '利润' },
+  { key: 'category', title: '分类' },
+  { key: 'status', title: '状态' },
+  { key: 'isHot', title: '是否热销' },
+];
 
 const ProductManage: React.FC = () => {
   const [form] = Form.useForm();
@@ -54,6 +77,8 @@ const ProductManage: React.FC = () => {
   const [pageSize, setPageSize] = useState(10);
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [previewUrl, setPreviewUrl] = useState('');
+  const [exportModalVisible, setExportModalVisible] = useState(false);
+  const [selectedFields, setSelectedFields] = useState<string[]>(['name', 'price']);
 
   // 加载分类数据
   const loadCategories = async () => {
@@ -346,6 +371,76 @@ const ProductManage: React.FC = () => {
     form.setFieldValue('image', url);
   };
 
+  // 处理导出字段选择
+  const handleFieldsChange = (checkedValues: string[]) => {
+    setSelectedFields(checkedValues);
+  };
+
+  // 处理导出
+  const handleExport = async () => {
+    if (selectedFields.length === 0) {
+      message.warning('请至少选择一个导出字段');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const { data: res } = await getProductList({
+        page: 1,
+        pageSize: 999999,
+      });
+
+      if (res.code === 200 && res.data) {
+        const exportData = res.data.list.map(item => {
+          const data: Record<string, any> = {};
+          selectedFields.forEach(field => {
+            switch (field) {
+              case 'name':
+                data['商品名称'] = item.name;
+                break;
+              case 'price':
+                data['价格'] = item.price;
+                break;
+              case 'stock':
+                data['库存'] = item.stock;
+                break;
+              case 'soldQuantity':
+                data['已售'] = item.soldQuantity;
+                break;
+              case 'availableStock':
+                data['可用库存'] = item.stock - item.soldQuantity;
+                break;
+              case 'costPrice':
+                data['成本价'] = item.costPrice;
+                break;
+              case 'profit':
+                data['利润'] = +(item.price - item.costPrice).toFixed(2);
+                break;
+              case 'category':
+                data['分类'] = item.category?.name || '--';
+                break;
+              case 'status':
+                data['状态'] = item.status === 'on' ? '上架' : '下架';
+                break;
+              case 'isHot':
+                data['是否热销'] = item.isHot ? '是' : '否';
+                break;
+            }
+          });
+          return data;
+        });
+
+        exportToExcel(exportData, dayjs().format('YYYY-MM-DD') + '商品表');
+        message.success('导出成功');
+        setExportModalVisible(false);
+      }
+    } catch (err) {
+      message.error('导出失败');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className={styles.container}>
       <Card
@@ -408,6 +503,14 @@ const ProductManage: React.FC = () => {
                     搜索
                   </Button>
                   <Button onClick={handleReset}>重置</Button>
+                  <Button
+                    type="primary"
+                    onClick={() => setExportModalVisible(true)}
+                    loading={loading}
+                    icon={<DownloadOutlined />}
+                  >
+                    导出价格表
+                  </Button>
                 </Space>
               </Form.Item>
             </Form>
@@ -540,6 +643,42 @@ const ProductManage: React.FC = () => {
           </div>
         </div>
             </Form>
+      </Modal>
+
+      {/* 添加导出选项模态框 */}
+      <Modal
+        title="选择导出字段"
+        open={exportModalVisible}
+        onOk={handleExport}
+        onCancel={() => setExportModalVisible(false)}
+        confirmLoading={loading}
+      >
+        <div className={styles.exportFields}>
+          <div className={styles.selectAll}>
+            <Checkbox
+              indeterminate={selectedFields.length > 0 && selectedFields.length < exportFields.length}
+              checked={selectedFields.length === exportFields.length}
+              onChange={(e) => {
+                setSelectedFields(
+                  e.target.checked ? exportFields.map(f => f.key) : []
+                );
+              }}
+            >
+              全选
+            </Checkbox>
+          </div>
+          <Checkbox.Group
+            value={selectedFields}
+            onChange={handleFieldsChange}
+            className={styles.checkboxGroup}
+          >
+            {exportFields.map(field => (
+              <Checkbox key={field.key} value={field.key}>
+                {field.title}
+              </Checkbox>
+            ))}
+          </Checkbox.Group>
+        </div>
       </Modal>
     </div>
   );

@@ -336,3 +336,23 @@
       }
     }
   }
+
+  .exportFields {
+    .selectAll {
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .checkboxGroup {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      
+      :global {
+        .ant-checkbox-wrapper {
+          margin-left: 0;
+        }
+      }
+    }
+  }
