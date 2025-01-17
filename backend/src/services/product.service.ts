@@ -89,51 +89,42 @@ export class ProductService {
   }
 
   async findAll(query: ProductQueryDto) {
-    try {
-      const {
-        page = 1,
-        pageSize = 10,
-        name,
-        categoryId,
-        status,
-        isHot,
-      } = query;
-      const where: any = {};
+    const { name, categoryId, status, isHot, page, pageSize } = query;
+    const queryBuilder = this.productRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.category', 'category');
 
-      if (name) {
-        where.name = Like(`%${name}%`);
-      }
-
-      if (categoryId) {
-        where.categoryId = categoryId;
-      }
-
-      if (status) {
-        where.status = status;
-      }
-
-      if (typeof isHot === 'boolean') {
-        where.isHot = isHot;
-      }
-
-      const [list, total] = await this.productRepository.findAndCount({
-        where,
-        relations: ['category'],
-        skip: (page - 1) * pageSize,
-        take: pageSize,
-        order: {
-          createdAt: 'DESC',
-        },
-      });
-
-      return {
-        list,
-        total,
-      };
-    } catch (error) {
-      this.logger.error('获取商品列表失败', error.stack);
-      throw error;
+    if (name) {
+      queryBuilder.andWhere('product.name LIKE :name', { name: `%${name}%` });
     }
+
+    if (categoryId) {
+      queryBuilder.andWhere('product.categoryId = :categoryId', { categoryId });
+    }
+
+    if (status) {
+      queryBuilder.andWhere('product.status = :status', { status });
+    }
+
+    if (typeof isHot === 'boolean') {
+      queryBuilder.andWhere('product.isHot = :isHot', { isHot });
+    }
+
+    // 如果不传分页参数，则返回所有数据
+    if (page && pageSize) {
+      queryBuilder.skip((page - 1) * pageSize).take(pageSize);
+    }
+
+    const [list, total] = await queryBuilder
+      .orderBy('product.createdAt', 'DESC')
+      .getManyAndCount();
+
+    return {
+      list,
+      total,
+      page: page || 1,
+      pageSize: pageSize || total,
+    };
   }
 
   async findOne(id: number) {
